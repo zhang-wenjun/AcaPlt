@@ -17,7 +17,7 @@ y = sin(x)' * linspace(0.1, 1, 10);
 
 f = AcaPlt;
 f.subplt(1, 1, 1);
-f.mdplt(x, y, 'r');
+f.mdplt(x, y, 'ig');
 
 xlabel('x');
 ylabel('y');

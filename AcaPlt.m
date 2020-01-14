@@ -77,7 +77,7 @@ classdef AcaPlt < matlab.mixin.Copyable
             elseif length(axInd) == 1
                 self.ActiveAxes = axInd;
             else
-                error('acaPlt.subplot: repeatition in AxesHandles!');
+                error('AcaPlt/subplt: Repeatition in AxesHandles!');
             end
             set(ax, ...
                 'NextPlot', 'add', ...
@@ -89,7 +89,7 @@ classdef AcaPlt < matlab.mixin.Copyable
         
         function plt(self, varargin)
             if nargin == 1
-                error('At least 1 input argument is required!');
+                error('AcaPlt/plt: At least 1 input argument is required!');
             end
             
             if isa(varargin{1}, 'matlab.graphics.axis.Axes')
@@ -99,8 +99,11 @@ classdef AcaPlt < matlab.mixin.Copyable
                 elseif length(axInd) == 1
                     self.ActiveAxes = axInd;
                 else
-                    error('acaPlt.subplot: repeatition in AxesHandles!');
+                    error('AcaPlt/plt: Repeatition in AxesHandles!');
                 end
+                args = varargin{2:end};
+            else
+                args = varargin;
             end
             
             curAxes = self.AxesHandles(self.ActiveAxes);
@@ -118,34 +121,35 @@ classdef AcaPlt < matlab.mixin.Copyable
             ArgNames = {'Color', 'LineStyle', 'LineWidth', 'Marker', ...
                 'MarkerIndices', 'MarkerEdgeColor', 'MarkerFaceColor', ...
                 'MarkerSize', 'DatetimeTickFormat', 'DurationTickFormat'};
-            for k = 1:length(varargin)
-                if ischar(varargin{k})
-                    if strcmpi(varargin{k}, 'LineWidth')
+            for k = 1:length(args)
+                if ischar(args{k})
+                    if strcmpi(args{k}, 'LineWidth')
                         LineWidthArg = {};
-                    elseif strcmpi(varargin{k}, 'Color')
+                    elseif strcmpi(args{k}, 'Color')
                         ColorArg = {};
-                    elseif ~any(strcmpi(varargin{k}, ArgNames))
-                        c = regexp(varargin{k}, '[bgrcmykw]');
+                    elseif ~any(strcmpi(args{k}, ArgNames))
+                        c = regexp(args{k}, '[bgrcmykw]');
                         if length(c) == 1
-                            ColorArg = {'Color', varargin{k}(c)};
+                            ColorArg = {'Color', args{k}(c)};
                             useColorSeq = false;
                         elseif ~isempty(c)
-                            error('Only ONE color could be specified!');
+                            error('AcaPlt/plt: Only ONE color could be specified!');
                         end
-                        f = regexp(varargin{k}, 'f');
+                        f = regexp(args{k}, 'f');
                         if length(f) == 1
                             if useColorSeq
                                 MarkerFaceArg = {'MarkerFaceColor', ...
                                     AcaPlt.FaceColorSeq(ColorIndex, :)};
                             else
                                 PreSetRGB = ...
-                                    AcaPlt.PreSetRGB(varargin{k}(c));
+                                    AcaPlt.PreSetRGB(args{k}(c));
                                 MarkerFaceArg = {'MarkerFaceColor', ...
                                     (1 - PreSetRGB) * 0.75 + PreSetRGB};
                             end
-                            varargin{k}(f) = [];
+                            args{k}(f) = [];
                         elseif ~isempty(f)
                             error([ ...
+                                'AcaPlt/plt: ', ...
                                 'Error in color/linetype argument: ', ...
                                 'multiple "f"!']);
                         end
@@ -153,7 +157,7 @@ classdef AcaPlt < matlab.mixin.Copyable
                 end
             end
             
-            PltArg = [varargin, LineWidthArg, ColorArg, MarkerFaceArg];
+            PltArg = [args, LineWidthArg, ColorArg, MarkerFaceArg];
             plot(PltArg{:});
             
             if useColorSeq
@@ -165,18 +169,21 @@ classdef AcaPlt < matlab.mixin.Copyable
         
         function errbar(self, varargin)
             if nargin == 1
-                error('At least 1 input argument is required!');
+                error('AcaPlt/errbar: At least 1 input argument is required!');
             end
             
             if isa(varargin{1}, 'matlab.graphics.axis.Axes')
                 axInd = find(varargin{1} == self.AxesHandles);
                 if isempty(axInd)
-                    error('This Axes does NOT belong to this Figure!')
+                    error('AcaPlt/errbar: This Axes does NOT belong to this Figure!')
                 elseif length(axInd) == 1
                     self.ActiveAxes = axInd;
                 else
-                    error('acaPlt.subplot: repeatition in AxesHandles!');
+                    error('AcaPlt/errbar: repeatition in AxesHandles!');
                 end
+                args = varargin{2:end};
+            else 
+                args = varargin;
             end
             
             curAxes = self.AxesHandles(self.ActiveAxes);
@@ -195,34 +202,35 @@ classdef AcaPlt < matlab.mixin.Copyable
                 'MarkerIndices', 'MarkerEdgeColor', 'MarkerFaceColor', ...
                 'MarkerSize', 'DatetimeTickFormat', ...
                 'DurationTickFormat', 'horizontal', 'vertical', 'both'};
-            for k = 1:length(varargin)
-                if ischar(varargin{k})
-                    if strcmpi(varargin{k}, 'LineWidth')
+            for k = 1:length(args)
+                if ischar(args{k})
+                    if strcmpi(args{k}, 'LineWidth')
                         LineWidthArg = {};
-                    elseif strcmpi(varargin{k}, 'Color')
+                    elseif strcmpi(args{k}, 'Color')
                         ColorArg = {};
-                    elseif ~any(strcmpi(varargin{k}, ArgNames))
-                        c = regexp(varargin{k}, '[bgrcmykw]');
+                    elseif ~any(strcmpi(args{k}, ArgNames))
+                        c = regexp(args{k}, '[bgrcmykw]');
                         if length(c) == 1
-                            ColorArg = {'Color', varargin{k}(c)};
+                            ColorArg = {'Color', args{k}(c)};
                             useColorSeq = false;
                         elseif ~isempty(c)
-                            error('Only ONE color could be specified!');
+                            error('AcaPlt/errbar: Only ONE color could be specified!');
                         end
-                        f = regexp(varargin{k}, 'f');
+                        f = regexp(args{k}, 'f');
                         if length(f) == 1
                             if useColorSeq
                                 MarkerFaceArg = {'MarkerFaceColor', ...
                                     AcaPlt.FaceColorSeq(ColorIndex, :)};
                             else
                                 PreSetRGB = ...
-                                    AcaPlt.PreSetRGB(varargin{k}(c));
+                                    AcaPlt.PreSetRGB(args{k}(c));
                                 MarkerFaceArg = {'MarkerFaceColor', ...
                                     (1 - PreSetRGB) * 0.75 + PreSetRGB};
                             end
-                            varargin{k}(f) = [];
+                            args{k}(f) = [];
                         elseif ~isempty(f)
                             error([ ...
+                                'AcaPlt/errbar: ', ...
                                 'Error in color/linetype argument: ', ...
                                 'multiple "f"!']);
                         end
@@ -230,7 +238,7 @@ classdef AcaPlt < matlab.mixin.Copyable
                 end
             end
             
-            PltArg = [varargin, LineWidthArg, ColorArg, MarkerFaceArg];
+            PltArg = [args, LineWidthArg, ColorArg, MarkerFaceArg];
             errorbar(PltArg{:});
             
             if useColorSeq
@@ -256,13 +264,13 @@ classdef AcaPlt < matlab.mixin.Copyable
             end
             
             if nargs == 0
-                error('At least 1 input argument is required!');
+                error('AcaPlt/mdplt: At least 1 input argument is required!');
             elseif nargs == 1
                 ydata = varargin{1};
                 if ~isnumeric(varargin{1})
-                    error('The ONLY input argument must be numeric!');
+                    error('AcaPlt/mdplt: The ONLY input argument must be numeric!');
                 elseif isvector(ydata)
-                    warning('For vector AcaPlt.plt is recommended!');
+                    warning('AcaPlt/mdplt: For vector AcaPlt/plt is recommended!');
                     xdata = 1:length(ydata);
                 else
                     xdata = repmat((1:size(ydata, 1))', 1, size(ydata, 2));
@@ -273,15 +281,15 @@ classdef AcaPlt < matlab.mixin.Copyable
                         && isnumeric(varargin{2})
                     axInd = find(varargin{1} == self.AxesHandles);
                     if isempty(axInd)
-                        error('This Axes does NOT belong to this Figure!')
+                        error('AcaPlt/mdplt: This Axes does NOT belong to this Figure!')
                     elseif length(axInd) == 1
                         self.ActiveAxes = axInd;
                     else
-                        error('acaPlt.subplt: repeatition in AxesHandles!');
+                        error('AcaPlt/mdplt: repeatition in AxesHandles!');
                     end
                     ydata = varargin{2};
                     if isvector(ydata)
-                        warning('For vector AcaPlt.plt is recommended!');
+                        warning('AcaPlt/mdplt: For vector AcaPlt/plt is recommended!');
                         xdata = 1:length(ydata);
                     else
                         xdata = repmat((1:size(ydata,1))',1,size(ydata,2));
@@ -291,6 +299,7 @@ classdef AcaPlt < matlab.mixin.Copyable
                     ydata = varargin{2};
                 else
                     error([ ...
+                        'AcaPlt/mdplt: ', ...
                         'For 2 input arguments: ', ...
                         '    AcaPlt.mdplt(axes, ydata)', ...
                         '    AcaPlt.mdplt(xdata, ydata)']);
@@ -301,31 +310,32 @@ classdef AcaPlt < matlab.mixin.Copyable
                         && isnumeric(varargin{2}) && isnumeric(varargin{3})
                     axInd = find(varargin{1} == self.AxesHandles);
                     if isempty(axInd)
-                        error('This Axes does NOT belong to this Figure!')
+                        error('AcaPlt/mdplt: This Axes does NOT belong to this Figure!')
                     elseif length(axInd) == 1
                         self.ActiveAxes = axInd;
                     else
-                        error('acaPlt.subplt: repeatition in AxesHandles!');
+                        error('AcaPlt/mdplt: repeatition in AxesHandles!');
                     end
                     xdata = varargin{2};
                     ydata = varargin{3};
                 else
                     error([ ...
+                        'AcaPlt/mdplt: ', ...
                         'For 3 input arguments: ', ...
                         '    AcaPlt.mdplt(axes, xdata, ydata)']);
                 end
                 NameValuePairs = varargin(4:end);
             else
-                error('Invalid input arguments!');
+                error('AcaPlt/mdplt: Invalid input arguments!');
             end
             
             if isvector(xdata) && isvector(ydata)
-                warning('For vector AcaPlt.plt is recommended!');
+                warning('AcaPlt/mdplt: For vector AcaPlt.plt is recommended!');
             elseif isvector(xdata) && length(xdata)==size(ydata,1)
                 xdata = repmat(xdata(:), 1, size(ydata,2));
             elseif all(size(xdata) == size(ydata))
             else
-                error('Invalid input data!');
+                error('AcaPlt/mdplt: Invalid input data!');
             end
                 
             color = AcaPlt.MDColor{1};
@@ -353,7 +363,7 @@ classdef AcaPlt < matlab.mixin.Copyable
                             elseif strcmpi(ctemp{1}, 'r')
                                 color = AcaPlt.MDColor{3};
                             else
-                                error('At least 2 color is required!');
+                                error('AcaPlt/mdplt: At least 2 color is required!');
                             end
                         else
                             for c = 1:length(ctemp)
@@ -385,7 +395,7 @@ classdef AcaPlt < matlab.mixin.Copyable
                         elseif strcmpi(ctemp{1}, 'r')
                             color = AcaPlt.MDColor{3};
                         else
-                            error('At least 2 color is required!');
+                            error('AcaPlt/mdplt: At least 2 color is required!');
                         end
                     else
                         for c = 1:length(ctemp)
@@ -397,7 +407,7 @@ classdef AcaPlt < matlab.mixin.Copyable
                         end
                     end
                 else
-                    error('Invalid argument!');
+                    error('AcaPlt/mdplt: Invalid argument!');
                 end
             end
             
@@ -428,6 +438,179 @@ classdef AcaPlt < matlab.mixin.Copyable
             end
             curAxes.NextPlot = tempNextPlot;
             
+        end
+        
+        function lgd(self, varargin)
+            if length(varargin) >= 1 && isa(varargin{1}, 'matlab.graphics.axis.Axes')
+                axInd = find(varargin{1} == self.AxesHandles);
+                if isempty(axInd)
+                    error('AcaPlt/lgd: This Axes does NOT belong to this Figure!')
+                elseif length(axInd) == 1
+                    self.ActiveAxes = axInd;
+                else
+                    error('AcaPlt/lgd: Repeatition in AxesHandles!');
+                end
+                args = varargin{2:end};
+            else
+                args = varargin;
+            end
+            
+            curAxes = self.AxesHandles(self.ActiveAxes);
+            
+            InterpreterArg = {'Interpreter', 'latex'};
+            for k = 1:length(args)
+                if strcmpi(args{k}, 'interpreter')
+                    InterpreterArg = {'Interpreter', args{k+1}};
+                end
+            end
+            
+            args = [args, InterpreterArg];
+            
+            legend(curAxes, args{:});
+            
+        end
+        
+        function xlabel(self, varargin)
+            if isa(varargin{1}, 'matlab.graphics.axis.Axes')
+                axInd = find(varargin{1} == self.AxesHandles);
+                if isempty(axInd)
+                    error('AcaPlt/xlabel: This Axes does NOT belong to this Figure!')
+                elseif length(axInd) == 1
+                    self.ActiveAxes = axInd;
+                else
+                    error('AcaPlt/xlabel: Repeatition in AxesHandles!');
+                end
+                args = varargin{2:end};
+            else
+                args = varargin;
+            end
+            
+            curAxes = self.AxesHandles(self.ActiveAxes);
+            
+            InterpreterArg = {'Interpreter', 'latex'};
+            for k = 1:length(args)
+                if strcmpi(args{k}, 'interpreter')
+                    InterpreterArg = {'Interpreter', args{k+1}};
+                end
+            end
+            
+            args = [args, InterpreterArg];
+            
+            xlabel(curAxes, args{:});
+        end
+        
+        function ylabel(self, varargin)
+            if isa(varargin{1}, 'matlab.graphics.axis.Axes')
+                axInd = find(varargin{1} == self.AxesHandles);
+                if isempty(axInd)
+                    error('AcaPlt/ylabel: This Axes does NOT belong to this Figure!')
+                elseif length(axInd) == 1
+                    self.ActiveAxes = axInd;
+                else
+                    error('AcaPlt/ylabel: Repeatition in AxesHandles!');
+                end
+                args = varargin{2:end};
+            else
+                args = varargin;
+            end
+            
+            curAxes = self.AxesHandles(self.ActiveAxes);
+            
+            InterpreterArg = {'Interpreter', 'latex'};
+            for k = 1:length(args)
+                if strcmpi(args{k}, 'interpreter')
+                    InterpreterArg = {'Interpreter', args{k+1}};
+                end
+            end
+            
+            args = [args, InterpreterArg];
+            
+            ylabel(curAxes, args{:});
+        end
+        
+        function title(self, varargin)
+            if isa(varargin{1}, 'matlab.graphics.axis.Axes')
+                axInd = find(varargin{1} == self.AxesHandles);
+                if isempty(axInd)
+                    error('AcaPlt/title: This Axes does NOT belong to this Figure!')
+                elseif length(axInd) == 1
+                    self.ActiveAxes = axInd;
+                else
+                    error('AcaPlt/title: Repeatition in AxesHandles!');
+                end
+                args = varargin{2:end};
+            else
+                args = varargin;
+            end
+            
+            curAxes = self.AxesHandles(self.ActiveAxes);
+            
+            InterpreterArg = {'Interpreter', 'latex'};
+            for k = 1:length(args)
+                if strcmpi(args{k}, 'interpreter')
+                    InterpreterArg = {'Interpreter', args{k+1}};
+                end
+            end
+            
+            args = [args, InterpreterArg];
+            
+            title(curAxes, args{:});
+        end
+        
+        function holdon(self, ax)
+            if nargin == 1
+                curAxes = self.AxesHandles(self.ActiveAxes);
+                hold(curAxes, 'on');
+            elseif nargin == 2
+                if isa(ax, 'matlab.graphics.axis.Axes')
+                    axInd = find(ax == self.AxesHandles);
+                    if isempty(axInd)
+                        error('AcaPlt/holon: This Axes does NOT belong to this Figure!')
+                    elseif length(axInd) == 1
+                        self.ActiveAxes = axInd;
+                    else
+                        error('AcaPlt/holon: Repeatition in AxesHandles!');
+                    end
+                else
+                    error('AcaPlt/holdon: Invalid input!');
+                end
+                curAxes = self.AxesHandles(self.ActiveAxes);
+                hold(curAxes, 'on');
+            else
+                error('AcaPlt/holdon: Invalid input!');
+            end
+        end
+        
+        function holdoff(self, ax)
+            if nargin == 1
+                curAxes = self.AxesHandles(self.ActiveAxes);
+                hold(curAxes, 'off');
+            elseif nargin == 2
+                if isa(ax, 'matlab.graphics.axis.Axes')
+                    axInd = find(ax == self.AxesHandles);
+                    if isempty(axInd)
+                        error('AcaPlt/holoff: This Axes does NOT belong to this Figure!')
+                    elseif length(axInd) == 1
+                        self.ActiveAxes = axInd;
+                    else
+                        error('AcaPlt/holoff: Repeatition in AxesHandles!');
+                    end
+                else
+                    error('AcaPlt/holdoff: Invalid input!');
+                end
+                curAxes = self.AxesHandles(self.ActiveAxes);
+                hold(curAxes, 'off');
+            else
+                error('AcaPlt/holdon: Invalid input!');
+            end
+        end
+        
+        function xlim(~, lim)
+            xlim(lim);
+        end
+        
+        function ylim(~, lim)
+            ylim(lim);
         end
             
     end
